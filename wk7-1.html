@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>필수 영어 단어 20 암기 앱</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      text-align: center;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 16px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      padding: 12px 8px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .nav-btn.active {
+      background: #ffffff;
+      color: #2563eb;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* 플래시카드 스타일 */
+    .card-container {
+      perspective: 1000px;
+      height: 240px;
+      width: 100%;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 16px;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+    }
+
+    .card-front {
+      color: #0f172a;
+    }
+
+    .card-front .word {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-front .hint {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 10px;
+    }
+
+    .card-back {
+      background: #2563eb;
+      color: #ffffff;
+      transform: rotateY(180deg);
+    }
+
+    .card-back .meaning {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-back .example {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      font-style: italic;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 14px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+      flex: 1;
+    }
+
+    .btn-primary:active {
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .btn-secondary:active {
+      background: #cbd5e1;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #2563eb;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* 퀴즈 스타일 */
+    .quiz-question {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 20px 0;
+      color: #1e293b;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      padding: 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #ffffff;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #334155;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .option-btn:active {
+      background: #f8fafc;
+    }
+
+    .option-btn.correct {
+      background: #dcfce7 !important;
+      border-color: #22c55e !important;
+      color: #15803d !important;
+    }
+
+    .option-btn.wrong {
+      background: #fee2e2 !important;
+      border-color: #ef4444 !important;
+      color: #b91c1c !important;
+    }
+
+    /* 목록 스타일 */
+    .word-list {
+      max-height: 380px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .word-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .word-item .eng {
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .word-item .kor {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .audio-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 8px;
+      touch-action: manipulation;
+    }
+
+    .result-box {
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .result-score {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #2563eb;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>오늘의 영어 단어 20</h1>
+      <p>매일 20개씩 완벽 암기하기</p>
+    </header>
+
+    <nav>
+      <button class="nav-btn active" onclick="switchTab('flashcard', event)">카드 학습</button>
+      <button class="nav-btn" onclick="switchTab('quiz', event)">퀴즈 풀기</button>
+      <button class="nav-btn" onclick="switchTab('list', event)">단어 목록</button>
+    </nav>
+
+    <!-- 1. 플래시카드 탭 -->
+    <div id="flashcard" class="tab-content active">
+      <div class="progress-bar">
+        <div id="card-progress" class="progress-fill"></div>
+      </div>
+      <div style="text-align: right; font-size: 0.85rem; color: #64748b;" id="card-index">1 / 20</div>
+
+      <div class="card-container" id="card-container">
+        <div class="card" id="card">
+          <div class="card-face card-front">
+            <div>
+              <span class="word" id="card-eng">Word</span>
+              <button class="audio-btn" id="card-audio-btn">🔊</button>
+            </div>
+            <div class="hint">터치해서 뜻 확인하기</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="meaning" id="card-kor">뜻</div>
+            <div class="example" id="card-ex">예문이 여기에 들어갑니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-secondary" onclick="prevCard()">이전</button>
+        <button class="btn btn-primary" onclick="nextCard()">다음</button>
+      </div>
+    </div>
+
+    <!-- 2. 퀴즈 탭 -->
+    <div id="quiz" class="tab-content">
+      <div id="quiz-main">
+        <div class="progress-bar">
+          <div id="quiz-progress" class="progress-fill"></div>
+        </div>
+        <div style="text-align: right; font-size: 0.85rem; color: #64748b; margin-top: 4px;" id="quiz-index">1 / 20</div>
+
+        <div class="quiz-question" id="quiz-question">Word</div>
+        <div class="quiz-options" id="quiz-options"></div>
+      </div>
+
+      <div id="quiz-result" class="result-box" style="display: none;">
+        <h2>퀴즈 완료!</h2>
+        <div class="result-score" id="result-score">0 / 20</div>
+        <p id="result-comment">수고하셨습니다!</p>
+        <button class="btn btn-primary" style="margin-top: 20px; width: 100%;" onclick="startQuiz()">다시 풀기</button>
+      </div>
+    </div>
+
+    <!-- 3. 단어 목록 탭 -->
+    <div id="list" class="tab-content">
+      <div class="word-list" id="word-list-container"></div>
+    </div>
+  </div>
+
+  <script>
+    const vocabulary = [
+      { eng: "achieve", kor: "달성하다, 성취하다", ex: "She worked hard to achieve her goals." },
+      { eng: "benefit", kor: "혜택, 이익", ex: "Fresh air is a great benefit to health." },
+      { eng: "challenge", kor: "도전, 과제", ex: "Learning a new language is a big challenge." },
+      { eng: "discover", kor: "발견하다", ex: "Scientists discovered a new species." },
+      { eng: "efficient", kor: "효율적인", ex: "We need a more efficient way of working." },
+      { eng: "flexible", kor: "유연한, 융통성 있는", ex: "My schedule is quite flexible today." },
+      { eng: "generate", kor: "창출하다, 발생시키다", ex: "The solar panels generate electricity." },
+      { eng: "hesitate", kor: "망설이다, 주저하다", ex: "Don't hesitate to ask for help." },
+      { eng: "improve", kor: "개선하다, 향상시키다", ex: "Practice every day to improve your skills." },
+      { eng: "journey", kor: "여정, 여행", ex: "Life is a long journey." },
+      { eng: "knowledge", kor: "지식", ex: "Reading books expands your knowledge." },
+      { eng: "maintain", kor: "유지하다, 관리하다", ex: "It is important to maintain a healthy diet." },
+      { eng: "negotiate", kor: "협상하다", ex: "They tried to negotiate a better price." },
+      { eng: "opportunity", kor: "기회", ex: "Don't miss this great opportunity." },
+      { eng: "persuade", kor: "설득하다", ex: "He managed to persuade her to join us." },
+      { eng: "require", kor: "요구하다, 필요로 하다", ex: "This task requires high concentration." },
+      { eng: "solution", kor: "해결책", ex: "We finally found a solution to the problem." },
+      { eng: "transform", kor: "변형시키다, 바꾸다", ex: "Technology can transform our lives." },
+      { eng: "ultimate", kor: "궁극적인, 최후의", ex: "Our ultimate objective is peace." },
+      { eng: "valuable", kor: "귀중한, 가치 있는", ex: "Time is one of our most valuable things." }
+    ];
+
+    let currentCardIdx = 0;
+    let currentQuizIdx = 0;
+    let quizScore = 0;
+    let quizQuestions = [];
+    let isFlipped = false;
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function switchTab(tabId, evt) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+      }
+
+      if (tabId === 'quiz' && quizQuestions.length === 0) {
+        startQuiz();
+      }
+    }
+
+    function updateCard() {
+      const item = vocabulary[currentCardIdx];
+      const cardEl = document.getElementById('card');
+      
+      if (isFlipped) {
+        cardEl.classList.remove('flipped');
+        isFlipped = false;
+        setTimeout(() => setCardData(item), 200);
+      } else {
+        setCardData(item);
+      }
+
+      document.getElementById('card-index').innerText = `${currentCardIdx + 1} / ${vocabulary.length}`;
+      document.getElementById('card-progress').style.width = `${((currentCardIdx + 1) / vocabulary.length) * 100}%`;
+    }
+
+    function setCardData(item) {
+      document.getElementById('card-eng').innerText = item.eng;
+      document.getElementById('card-kor').innerText = item.kor;
+      document.getElementById('card-ex').innerText = `"${item.ex}"`;
+    }
+
+    function flipCard() {
+      const cardEl = document.getElementById('card');
+      isFlipped = !isFlipped;
+      cardEl.classList.toggle('flipped');
+    }
+
+    function nextCard() {
+      if (currentCardIdx < vocabulary.length - 1) {
+        currentCardIdx++;
+      } else {
+        currentCardIdx = 0;
+      }
+      updateCard();
+    }
+
+    function prevCard() {
+      if (currentCardIdx > 0) {
+        currentCardIdx--;
+      } else {
+        currentCardIdx = vocabulary.length - 1;
+      }
+      updateCard();
+    }
+
+    function startQuiz() {
+      currentQuizIdx = 0;
+      quizScore = 0;
+      quizQuestions = [...vocabulary].sort(() => Math.random() - 0.5);
+
+      document.getElementById('quiz-main').style.display = 'block';
+      document.getElementById('quiz-result').style.display = 'none';
+
+      showQuizQuestion();
+    }
+
+    function showQuizQuestion() {
+      const q = quizQuestions[currentQuizIdx];
+      document.getElementById('quiz-question').innerText = q.eng;
+      document.getElementById('quiz-index').innerText = `${currentQuizIdx + 1} / ${vocabulary.length}`;
+      document.getElementById('quiz-progress').style.width = `${((currentQuizIdx + 1) / vocabulary.length) * 100}%`;
+
+      speak(q.eng);
+
+      const wrongOptions = vocabulary
+        .filter(item => item.eng !== q.eng)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3)
+        .map(item => item.kor);
+
+      const options = [q.kor, ...wrongOptions].sort(() => Math.random() - 0.5);
+
+      const optionsContainer = document.getElementById('quiz-options');
+      optionsContainer.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(btn, opt === q.kor);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedBtn, isCorrect) {
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(btn => btn.style.pointerEvents = 'none');
+
+      if (isCorrect) {
+        selectedBtn.classList.add('correct');
+        quizScore++;
+      } else {
+        selectedBtn.classList.add('wrong');
+        buttons.forEach(btn => {
+          if (btn.innerText === quizQuestions[currentQuizIdx].kor) {
+            btn.classList.add('correct');
+          }
+        });
+      }
+
+      setTimeout(() => {
+        currentQuizIdx++;
+        if (currentQuizIdx < vocabulary.length) {
+          showQuizQuestion();
+        } else {
+          showQuizResult();
+        }
+      }, 1200);
+    }
+
+    function showQuizResult() {
+      document.getElementById('quiz-main').style.display = 'none';
+      document.getElementById('quiz-result').style.display = 'block';
+      document.getElementById('result-score').innerText = `${quizScore} / ${vocabulary.length}`;
+
+      let comment = "";
+      if (quizScore === 20) comment = "🎉 완벽합니다! 모든 단어를 외우셨네요!";
+      else if (quizScore >= 15) comment = "👍 훌륭해요! 조금만 더 연습해봐요.";
+      else if (quizScore >= 10) comment = "🙂 잘하고 있어요! 복습이 조금 더 필요해요.";
+      else comment = "💪 다시 한번 플래시 카드로 복습해보세요!";
+
+      document.getElementById('result-comment').innerText = comment;
+    }
+
+    function renderWordList() {
+      const container = document.getElementById('word-list-container');
+      container.innerHTML = '';
+
+      vocabulary.forEach((item, idx) => {
+        const el = document.createElement('div');
+        el.className = 'word-item';
+        el.innerHTML = `
+          <div>
+            <span class="eng">${idx + 1}. ${item.eng}</span>
+            <button class="audio-btn" onclick="speak('${item.eng}')">🔊</button>
+          </div>
+          <div class="kor">${item.kor}</div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    // 이벤트 리스너 안전 등록
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCard();
+      renderWordList();
+
+      const cardContainer = document.getElementById('card-container');
+      const audioBtn = document.getElementById('card-audio-btn');
+
+      cardContainer.addEventListener('click', (e) => {
+        if (e.target.closest('#card-audio-btn')) {
+          e.stopPropagation();
+          speak(vocabulary[currentCardIdx].eng);
+        } else {
+          flipCard();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
